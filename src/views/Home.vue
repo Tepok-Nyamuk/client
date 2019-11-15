@@ -25,11 +25,11 @@
     </form>
 
 
-      <!-- <button @click.prevent="addScore">tambah</button> -->
-        <!-- <ul v-for="(score,index) in scores" :key="index"> -->
-            <!-- <li :key="score.username">{{score.username}}</li> -->
-            <!-- <li :key="score.score">{{score.score}}</li> -->
-        <!-- </ul> -->
+      <button @click.prevent="addScore">tambah</button>
+        <ul v-for="(score,index) in scores" :key="index">
+            <li :key="score.username">{{score.username}}</li>
+            <li :key="score.score">{{score.score}}</li>
+        </ul>
 
       <button @click="addScore" class="mosquitos" :style= "{top:positionX + 'px', right:positionY + 'px'}" >
       </button>
@@ -96,7 +96,7 @@ export default {
     createRoom() {
           console.log({name : this.roomName, player : this.roomPlayers})
           this.mySocket.emit('create', {name : this.roomName, player : this.roomPlayers}) 
-      },
+    },
     joinRoom(room) {
         this.mySocket.emit('join', room) 
     }
