@@ -1,9 +1,15 @@
 <template>
   <div class="home newcursor" >
-    <!-- <div class="firefly">
-    </div> -->
-    
 
+    <!-- <div class="container-fluid">
+      <div class="container" v-if='isLogin'>
+      <div class="d-flex flex-column">
+      
+      
+    </div>
+  </div> -->
+    
+<!-- --------------------------------------------------------------------------- -->
      <h2>Create Room</h2>
         <form action="" @submit.prevent="createRoom">
             <label for="">Room Name</label>
@@ -12,29 +18,16 @@
             <input type="number" v-model="roomPlayers"> <br>
             <input type="submit">
         </form>
+<!-- --------------------------------------------------------------------------- -->
 
-        <h2>Join Room</h2>
-        <ul v-for="room in roomList" :key="room">
-            <a href="" @click.prevent="joinRoom(room)">{{ room }}</a>
-        </ul>
-
-    <form v-if='!isLogin' action="" @submit.prevent="login">
-        <label for="username">username</label>
-        <input v-model="username" type="text">
-        <input type="submit">
-    </form>
-
-
-
-
-        <div class="playerBoard">
+        
       <!-- ------------------------------------------ -->
 
       <button @click.prevent="addScore">tambah</button>
-        <!-- <ul v-for="(score,index) in scores" :key="index">
+        <ul v-for="(score,index) in scores" :key="index">
             <li :key="score.username">player : {{score.username}}</li>
             <li :key="score.score">{{score.score}}</li>
-        </ul> -->
+        </ul>
 
       <button @click="addScore" class="mosquitos" :style= "{top:positionX + 'px', right:positionY + 'px'}" >
       </button>
@@ -45,13 +38,20 @@
                 <br>
             </b-card>
             <br>
-
       <!-- ----------------------------------------- -->
-          </div>
         </div>
+           <form v-if='!isLogin' action="" @submit.prevent="login">
+            <label for="username">username</label>
+            <input v-model="username" type="text">
+            <input type="submit">
+        </form>
+      </div>
+
+      
+      
 
     
-  </div>
+
 </template>
 
 <script>
@@ -72,15 +72,16 @@ export default {
       positionX: '', //0-800
       positionY: '', //0-1400
       roomList : [],
+      isRoomReady: false
     }
   },
   name: 'home',
   methods:{
     
     login() {            
-      console.log('login guyss')
-            this.mySocket.emit('user-login', this.username )        
+      this.mySocket.emit('user-login', this.username )        
             this.isLogin = true
+      console.log('login guyss')
     },
     // sendMessage() {
     //     console.log('send')
@@ -95,6 +96,7 @@ export default {
     createRoom() {
           console.log({name : this.roomName, player : this.roomPlayers})
           this.mySocket.emit('create', {name : this.roomName, player : this.roomPlayers}) 
+          this.isRoomReady = true
     },
     joinRoom(room) {
         this.mySocket.emit('join', room) 
@@ -120,7 +122,7 @@ export default {
           if(data.message.score.score == 10){ 
             //  alert(`${data.message.username} win`)
             this.alertDisplay('Heading',data.message.username)
-            
+
           }
             
             let obj = {
@@ -145,6 +147,22 @@ export default {
 </script>
 
 <style>
+
+.card-body {
+    -ms-flex: 1 1 auto;
+    -webkit-box-flex: 1;
+    flex: 3 4 auto;
+    padding: -1rem;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+}
+.create{
+  /* background-image: url(../img/welcome-board.png); */
+  height:100vh;
+  background-repeat: no-repeat;
+  right:500px;
+}
 
 .firefly{
   background-image: url(../img/fire-fly.gif);
