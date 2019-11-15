@@ -96,7 +96,7 @@ export default {
     createRoom() {
           console.log({name : this.roomName, player : this.roomPlayers})
           this.mySocket.emit('create', {name : this.roomName, player : this.roomPlayers}) 
-      },
+    },
     joinRoom(room) {
         this.mySocket.emit('join', room) 
     }
