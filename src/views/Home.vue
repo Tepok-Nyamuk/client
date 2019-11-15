@@ -1,37 +1,55 @@
 <template>
   <div class="home newcursor" >
-    score : {{score}}
+    <!-- <div class="firefly">
+    </div> -->
+    
+
+     <h2>Create Room</h2>
+        <form action="" @submit.prevent="createRoom">
+            <label for="">Room Name</label>
+            <input type="text" v-model="roomName"> <br>
+            <label for="">Number of Player</label>
+            <input type="number" v-model="roomPlayers"> <br>
+            <input type="submit">
+        </form>
+
+        <h2>Join Room</h2>
+        <ul v-for="room in roomList" :key="room">
+            <a href="" @click.prevent="joinRoom(room)">{{ room }}</a>
+        </ul>
+
     <form v-if='!isLogin' action="" @submit.prevent="login">
         <label for="username">username</label>
         <input v-model="username" type="text">
         <input type="submit">
     </form>
-    <form v-if="isLogin" action="" @submit.prevent="sendMessage">
-        <label for="message">message</label>
-        <input type="text" v-model="message">
-        <input type="submit" name="send" id="" value="send">
-    </form>
+
 
       <!-- <button @click.prevent="addScore">tambah</button> -->
-        <ul v-for="(score,index) in scores" :key="index">
-            <li :key="score.username">{{score.username}}</li>
-            <li :key="score.score">{{score.score}}</li>
-        </ul>
+        <!-- <ul v-for="(score,index) in scores" :key="index"> -->
+            <!-- <li :key="score.username">{{score.username}}</li> -->
+            <!-- <li :key="score.score">{{score.score}}</li> -->
+        <!-- </ul> -->
 
       <button @click="addScore" class="mosquitos" :style= "{top:positionX + 'px', right:positionY + 'px'}" >
       </button>
-        <!-- <div class="playerBoard">
 
-          <div class="players">
-            <b-card class="playerScore" style="top:100px;">
-              <b-card-title>{{player}}</b-card-title>
-              <h5> score : {{score}}</h5>
-              <br>
+
+        <div class="playerBoard">
+      <!-- ------------------------------------------ -->
+
+            <div class="players">
+              <b-card class="playerScore" style="top:100px; display:flex;padding-bottom:-50px;">
+                <b-card-title>player A</b-card-title>
+                <h4> score : {{score}}</h4>
+                <br>
             </b-card>
-            
             <br>
+
+      <!-- ----------------------------------------- -->
           </div>
-        </div> -->
+        </div>
+
     
   </div>
 </template>
@@ -47,24 +65,19 @@ export default {
       isLogin : false,
       messages : [],
       message : '',
-      roomA : [],
-      roomB : [],
       score : 0,
-      scores : [],  
-      roomA : false,
-      roomB : false,
-      myRoom : '',  
+      scores : [],
+      myRoom : '',
+      roomName : "",
+      roomPlayers : 0,
       positionX: '', //0-800
       positionY: '', //0-1400
+      roomList : [],
     }
   },
   name: 'home',
   methods:{
-    addScore(){
-      this.score ++
-      console.log(this.score);
-      
-    },
+    
     login() {            
       console.log('login guyss')
             this.mySocket.emit('user-login', this.username )        
@@ -80,15 +93,12 @@ export default {
         // this.mySocket.emit('send-score', this.score)
         this.mySocket.emit('send-score', {room : this.myRoom, score : this.score} )
     },
-    activRoomA() {
-        this.roomA = true;
-        this.mySocket.emit('create', 'roomA')
-        this.myRoom = 'roomA'
-    },
-    activRoomB() {
-        this.roomB = true;
-        this.mySocket.emit('create', 'roomB')
-        this.myRoom = "roomB"
+    createRoom() {
+          console.log({name : this.roomName, player : this.roomPlayers})
+          this.mySocket.emit('create', {name : this.roomName, player : this.roomPlayers}) 
+      },
+    joinRoom(room) {
+        this.mySocket.emit('join', room) 
     }
   },
   created () {
@@ -96,6 +106,12 @@ export default {
           // console.log(data)
             this.positionX = data.xAxis
             this.positionY = data.yAxis
+        })
+        this.mySocket.on('send-roomList', (data) => {
+            this.roomList = data
+        })
+        this.mySocket.on('send-loading', (data) => {
+            console.log('loading dulu yahhh..')
         })
         this.mySocket.on('all-score', data => {
             console.log('data=================', data)
@@ -107,9 +123,7 @@ export default {
                 this.scores.push(obj)
                 console.log('this.scores', this.scores)
             } else {
-                // if (data.username === this.username) {
-                //     this.score = data.score
-                // }
+             
                 for(let i=0; i<this.scores.length; i++) {
                     if(this.scores[i].username == data.message.username) {
                         let newScore = this.scores[i].score ++
@@ -126,6 +140,12 @@ export default {
 </script>
 
 <style>
+
+.firefly{
+  background-image: url(../img/fire-fly.gif);
+  height:100vh;
+  background-blend-mode: screen;
+}
 .home{
   height: 100vh;
   background-image: url(../img/background.jpg);
@@ -148,22 +168,25 @@ button:focus { outline: none; }
   height: 120px;
   background-image: url(../img/mosquito.png);
   background-repeat: no-repeat;
-  cursor:url(../img/cursor-hover.png),auto;
   background-color:transparent;
   border :none;
+}
+
+.mosquitos:hover{
+  cursor:url(../img/cursor-hover.png),auto;
 }
 .mosquitos:active{
   cursor:url(../img/hit-effect.png) ,auto;
   height: 200px;
 }
 
-.custom {
-  cursor: url(../img/cursor.png), auto;
-}
+/* .custom {
+  cursor: url(../img/cursor-hover.png), auto;
+} */
 
-div {
-    cursor:url(../img/cursor.png),auto;
-}
+/* div {
+    cursor:url(../img/cursor-hover.png),auto;
+} */
 
 .card-body {
     -ms-flex: 1 1 auto;
