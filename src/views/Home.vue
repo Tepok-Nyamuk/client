@@ -17,6 +17,7 @@
             <li :key="score.username">{{score.username}}</li>
             <li :key="score.score">{{score.score}}</li>
         </ul>
+
       <button @click="addScore" class="mosquitos" :style= "{top:positionX + 'px', right:positionY + 'px'}" >
       </button>
         <!-- <div class="playerBoard">
@@ -61,6 +62,8 @@ export default {
   methods:{
     addScore(){
       this.score ++
+      console.log(this.score);
+      
     },
     login() {            
       console.log('login guyss')
