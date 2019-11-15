@@ -25,23 +25,23 @@
     </form>
 
 
-      <button @click.prevent="addScore">tambah</button>
-        <ul v-for="(score,index) in scores" :key="index">
-            <li :key="score.username">{{score.username}}</li>
-            <li :key="score.score">{{score.score}}</li>
-        </ul>
-
-      <button @click="addScore" class="mosquitos" :style= "{top:positionX + 'px', right:positionY + 'px'}" >
-      </button>
 
 
         <div class="playerBoard">
       <!-- ------------------------------------------ -->
 
-            <div class="players">
+      <button @click.prevent="addScore">tambah</button>
+        <!-- <ul v-for="(score,index) in scores" :key="index">
+            <li :key="score.username">player : {{score.username}}</li>
+            <li :key="score.score">{{score.score}}</li>
+        </ul> -->
+
+      <button @click="addScore" class="mosquitos" :style= "{top:positionX + 'px', right:positionY + 'px'}" >
+      </button>
+            <div class="players" v-for="(score,index) in scores" :key="index">
               <b-card class="playerScore" style="top:100px; display:flex;padding-bottom:-50px;">
-                <b-card-title>player A</b-card-title>
-                <h4> score : {{score}}</h4>
+                <b-card-title :key="score.username">{{score.username}}</b-card-title>
+                <h4 :key="score.score">score : {{score.score}}</h4>
                 <br>
             </b-card>
             <br>
@@ -59,7 +59,6 @@
 export default {
   data(){
     return {
-      score: 0,
       username : '',
       mySocket : io("http://localhost:3000"),
       isLogin : false,
@@ -83,14 +82,14 @@ export default {
             this.mySocket.emit('user-login', this.username )        
             this.isLogin = true
     },
-    sendMessage() {
-        console.log('send')
-        this.mySocket.emit('send-message', this.message)   
-        //this.mySocket.in(room)        
-    },
+    // sendMessage() {
+    //     console.log('send')
+    //     this.mySocket.emit('send-message', this.message)   
+    //     //this.mySocket.in(room)        
+    // },
     addScore() {
         this.score ++
-        // this.mySocket.emit('send-score', this.score)
+        console.log('darii add score', {room : this.myRoom, score : this.score} )
         this.mySocket.emit('send-score', {room : this.myRoom, score : this.score} )
     },
     createRoom() {
@@ -99,6 +98,9 @@ export default {
     },
     joinRoom(room) {
         this.mySocket.emit('join', room) 
+    },
+    alertDisplay(obj,winner){
+      this.$swal(`${winner} won the game!`, 'he manage to kill 10 mosquitos faster than you!', 'OK')
     }
   },
   created () {
@@ -110,29 +112,32 @@ export default {
         this.mySocket.on('send-roomList', (data) => {
             this.roomList = data
         })
-        this.mySocket.on('send-loading', (data) => {
-            console.log('loading dulu yahhh..')
+        this.mySocket.on('send-loading', (data) => {     
         })
         this.mySocket.on('all-score', data => {
-            console.log('data=================', data)
+          
+
+          if(data.message.score.score == 10){ 
+            //  alert(`${data.message.username} win`)
+            this.alertDisplay('Heading',data.message.username)
+            
+          }
+            
+            let obj = {
+                username : data.message.username,
+                score : data.message.score.score
+            }          
             if(this.scores.length === 0 ) {  
-                let obj = {
-                    username : data.message.username,
-                    score : data.message.score.score
-                }          
-                this.scores.push(obj)
-                console.log('this.scores', this.scores)
-            } else {
-             
+              this.scores.push(obj)
+            } else { 
                 for(let i=0; i<this.scores.length; i++) {
                     if(this.scores[i].username == data.message.username) {
                         let newScore = this.scores[i].score ++
                         this.$set(this.scores[i].score, newScore)
-                        console.log('this.scores', this.scores)
                         break
                     }
                 }
-                this.scores.push(data)
+                this.scores.push(obj)
             }
         })
     }

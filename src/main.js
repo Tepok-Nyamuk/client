@@ -4,7 +4,10 @@ import router from './router'
 import store from './store'
 import BootstrapVue from 'bootstrap-vue'
 import PortalVue from 'portal-vue'
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
+Vue.use(VueSweetalert2);
 Vue.use(PortalVue)
 Vue.use(BootstrapVue)
 Vue.config.productionTip = false
